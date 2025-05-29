@@ -8,6 +8,7 @@ import time
 from apscheduler.schedulers.background import BackgroundScheduler
 from run_swing_analyer import run_swing_analyzer
 import shutil
+import json
 
 app = Flask(__name__)
 CORS(app)  # CORS 허용
@@ -67,13 +68,15 @@ def upload_file():
             input_path = os.path.join(UPLOAD_FOLDER, f"{file_id}_input.mp4")
             file.save(input_path)
 
+            file_id = "304"
             # 영상 처리 실행
             run_swing_analyzer(file_id)
 
             return jsonify({
                 "message": "File processed successfully",
                 "download_url": f"/download/video/{file_id}",
-                "zip_url": f"/download/images/{file_id}"
+                "zip_url": f"/download/images/{file_id}",
+                "swing_analysis": f"/result/{file_id}"
             }), 200
 
         return jsonify({"error": "Invalid file type"}), 400
@@ -122,6 +125,22 @@ def download_images(file_id):
         download_name=zip_filename
     )
 
+# json 파일로 분석 결과 반환
+@app.route('/result/<file_id>', methods=['GET'])
+def get_result(file_id):
+    """분석 결과 반환"""
+    processed_folder = os.path.join(PROCESSED_FOLDER, file_id)
+    json_file_path = os.path.join(processed_folder, f"{file_id}_swing_analysis.json")
+
+    if not os.path.exists(json_file_path):
+        return jsonify({"error": "Result not found"}), 404
+
+    try:
+        with open(json_file_path, 'r') as file:
+            data = json.load(file)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/health', methods=['GET'])
 def health_check():

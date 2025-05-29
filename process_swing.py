@@ -4,6 +4,8 @@ import os
 import numpy as np
 pd.options.mode.chained_assignment = None 
 import matplotlib.pyplot as plt
+import csv
+import json
 
 class DataProcessor:
     """
@@ -152,18 +154,31 @@ class VideoProcessor:
             'correct_knee_angle': 'WRONG: Knee should not bend as much.'
         }
         #Iterate over each swing part and create the analysis message
+        # save as csv file
         analysis = []
-        for swing_part, checks in self.correct.items():
-            part_analysis = [f"Swing part {swing_part.upper()}: "]
-            messages_list = []
-            for check, value in checks.items():
-                if value == 0:
-                    messages_list.append("-> " + messages[check])
+        json_data = []  # JSON 데이터를 저장할 리스트 생성
+        json_filename = f'{self.folder_path}/{self.folder_path.split("/")[1]}_swing_analysis.json'
+        with open(json_filename, mode='w', encoding='utf-8') as jsonfile:
+            for swing_part, checks in self.correct.items():
+                part_analysis = [f"Swing part {swing_part.upper()}: "]
+                messages_list = []
+                for check, value in checks.items():
+                    if value == 1:
+                        messages_list.append("-> " + messages[check])
+                        json_data.append({
+                            "swing_part": swing_part.upper(),
+                            "evaluation": messages[check]
+                        })
 
-            if messages_list:
-                analysis.append("\n".join([part_analysis[0]] + messages_list))
+                if messages_list:
+                    analysis.append("\n".join([part_analysis[0]] + messages_list))
+            json.dump(json_data, jsonfile, ensure_ascii=False, indent=4)
 
         print("\n\n".join(analysis))
+    #     save txt file with the analysis
+        with open(self.folder_path + f'/{self.folder_path.split("/")[1]}_swing_analysis.txt', 'w') as f:
+            f.write("\n\n".join(analysis))
+            print("Analysis saved to swing_analysis.txt")
 
     def save_frame(self):
         """
