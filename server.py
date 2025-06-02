@@ -68,7 +68,7 @@ def upload_file():
             input_path = os.path.join(UPLOAD_FOLDER, f"{file_id}_input.mp4")
             file.save(input_path)
 
-            file_id = "304"
+            # file_id = "304"
             # 영상 처리 실행
             run_swing_analyzer(file_id)
 
