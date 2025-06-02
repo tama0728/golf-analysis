@@ -163,7 +163,7 @@ class VideoProcessor:
                 part_analysis = [f"Swing part {swing_part.upper()}: "]
                 messages_list = []
                 for check, value in checks.items():
-                    if value == 1:
+                    if value == 0:
                         messages_list.append("-> " + messages[check])
                         json_data.append({
                             "swing_part": swing_part.upper(),
