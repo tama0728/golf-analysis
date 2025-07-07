@@ -145,14 +145,24 @@ class VideoProcessor:
         """
         Prints the messages based on evaluations.
         """
-        messages = {
-            'correct_midpoint': 'WRONG: Arms should be positioned more to the left side of the center of feet.',
-            'correct_arm_angle': 'WRONG: Left arm should be straight at this point.',
-            'correct_pelvis': 'WRONG: Left ankle, left hip and right shoulder angle should form a straight line. Try turning more into the backswing.',
-            'correct_head':  'WRONG: Head should remain relatively still until contact.',
-            'correct_shoulder_ankle': 'WRONG: Left shoulder should not go beyond the front foot at this point.',
-            'correct_knee_angle': 'WRONG: Knee should not bend as much.'
+        messages_wrong = {
+            'correct_midpoint': '오류: 팔이 발 중앙보다 더 왼쪽에 위치해야 합니다.',
+            'correct_arm_angle': '오류: 이 시점에서 왼팔이 곧게 펴져 있어야 합니다.',
+            'correct_pelvis': '오류: 왼쪽 발목, 왼쪽 엉덩이, 오른쪽 어깨가 일직선을 이루어야 합니다. 백스윙을 더 돌려보세요.',
+            'correct_head': '오류: 임팩트 순간까지 머리가 상대적으로 고정되어 있어야 합니다.',
+            'correct_shoulder_ankle': '오류: 이 시점에서 왼쪽 어깨가 앞발을 넘지 않아야 합니다.',
+            'correct_knee_angle': '오류: 무릎이 너무 많이 굽혀지지 않아야 합니다.'
         }
+
+        messages_correct = {
+            'correct_midpoint': '정확: 팔이 발 중앙보다 왼쪽에 잘 위치하고 있습니다.',
+            'correct_arm_angle': '정확: 왼팔이 이 시점에서 곧게 뻗어 있습니다.',
+            'correct_pelvis': '정확: 왼쪽 발목, 왼쪽 엉덩이, 오른쪽 어깨가 일직선을 이루고 있습니다. 백스윙 회전도 좋습니다.',
+            'correct_head': '정확: 임팩트 순간까지 머리가 잘 고정되어 있습니다.',
+            'correct_shoulder_ankle': '정확: 왼쪽 어깨가 앞발을 넘지 않고 잘 유지되고 있습니다.',
+            'correct_knee_angle': '정확: 무릎이 적절하게 펴져 있습니다.'
+        }
+
         #Iterate over each swing part and create the analysis message
         # save as csv file
         analysis = []
@@ -164,10 +174,18 @@ class VideoProcessor:
                 messages_list = []
                 for check, value in checks.items():
                     if value == 0:
-                        messages_list.append("-> " + messages[check])
+                        messages_list.append("-> " + messages_wrong[check])
                         json_data.append({
                             "swing_part": swing_part.upper(),
-                            "evaluation": messages[check]
+                            "posture": check,
+                            "evaluation": messages_wrong[check]
+                        })
+                    else:
+                        messages_list.append("-> " + messages_correct[check])
+                        json_data.append({
+                            "swing_part": swing_part.upper(),
+                            "posture": check,
+                            "evaluation": messages_correct[check]
                         })
 
                 if messages_list:

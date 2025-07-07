@@ -75,7 +75,11 @@ def upload_file():
             return jsonify({
                 "message": "File processed successfully",
                 "download_url": f"/download/video/{file_id}",
+                "video_url": f"/download/video/{file_id}",
                 "zip_url": f"/download/images/{file_id}",
+                "image_address_url": f"/download/image/address/{file_id}",
+                "image_contact_url": f"/download/image/contact/{file_id}",
+                "image_top_url": f"/download/image/top/{file_id}",
                 "swing_analysis": f"/result/{file_id}"
             }), 200
 
@@ -125,6 +129,46 @@ def download_images(file_id):
         download_name=zip_filename
     )
 
+@app.route('/download/image/address/<file_id>', methods=['GET'])
+def download_address_image(file_id):
+    """처리된 이미지 다운로드"""
+    image_file = os.path.join(PROCESSED_FOLDER + f"/{file_id}/", f"{file_id}_output_frame_address.jpg")
+    if not os.path.exists(image_file):
+        return jsonify({"error": "File not found"}), 404
+
+    return send_file(
+        image_file,
+        mimetype='image/jpeg',
+        as_attachment=True,
+        download_name=f"{file_id}_output_frame_address.jpg"
+    )
+
+@app.route('/download/image/top/<file_id>', methods=['GET'])
+def download_top_image(file_id):
+    """처리된 이미지 다운로드"""
+    image_file = os.path.join(PROCESSED_FOLDER + f"/{file_id}/", f"{file_id}_output_frame_top.jpg")
+    if not os.path.exists(image_file):
+        return jsonify({"error": "File not found"}), 404
+    return send_file(
+        image_file,
+        mimetype='image/jpeg',
+        as_attachment=True,
+        download_name=f"{file_id}_output_frame_top.jpg"
+    )
+
+@app.route('/download/image/contact/<file_id>', methods=['GET'])
+def download_contact_image(file_id):
+    """처리된 이미지 다운로드"""
+    image_file = os.path.join(PROCESSED_FOLDER + f"/{file_id}/", f"{file_id}_output_frame_contact.jpg")
+    if not os.path.exists(image_file):
+        return jsonify({"error": "File not found"}), 404
+    return send_file(
+        image_file,
+        mimetype='image/jpeg',
+        as_attachment=True,
+        download_name=f"{file_id}_output_frame_contact.jpg"
+    )
+
 # json 파일로 분석 결과 반환
 @app.route('/result/<file_id>', methods=['GET'])
 def get_result(file_id):
@@ -162,5 +206,6 @@ def schedule_cleanup():
     scheduler.start()
 
 if __name__ == '__main__':
-    schedule_cleanup()
+    # schedule_cleanup()
     app.run(host='0.0.0.0', port=5005, threaded=True)
+    # download_image("9b3ca581-14af-4e2b-82fc-3dea9ccc8631")
