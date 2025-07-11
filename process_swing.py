@@ -163,13 +163,27 @@ class VideoProcessor:
             'correct_knee_angle': '정확: 무릎이 적절하게 펴져 있습니다.'
         }
 
+        score_table = {
+            'correct_midpoint': 15,
+            'correct_arm_angle': 20,
+            'correct_pelvis': 25,
+            'correct_head': 15,
+            'correct_shoulder_ankle': 15,
+            'correct_knee_angle': 10
+        }
+
         #Iterate over each swing part and create the analysis message
         # save as csv file
         analysis = []
         json_data = []  # JSON 데이터를 저장할 리스트 생성
+        total_score = 0  # 총 점수를 초기화
+        max_score = 0
+        score_data = [] # 점수 데이터를 저장할 리스트 생성
         json_filename = f'{self.folder_path}/{self.folder_path.split("/")[1]}_swing_analysis.json'
-        with open(json_filename, mode='w', encoding='utf-8') as jsonfile:
+        score_filename = f'{self.folder_path}/{self.folder_path.split("/")[1]}_swing_score.json'
+        with open(json_filename, mode='w', encoding='utf-8') as jsonfile , open(score_filename, mode='w', encoding='utf-8') as scorefile:
             for swing_part, checks in self.correct.items():
+                part_score = 0  # 각 스윙 파트의 점수를 초기화
                 part_analysis = [f"Swing part {swing_part.upper()}: "]
                 messages_list = []
                 for check, value in checks.items():
@@ -187,16 +201,23 @@ class VideoProcessor:
                             "posture": check,
                             "evaluation": messages_correct[check]
                         })
-
+                        part_score += score_table[check]
+                    max_score += score_table[check]
+                score_data.append({"swing_part": swing_part.upper(), "score": round(part_score/ max_score * 100, 2)})  # 각 스윙 파트의 점수를 백분율로 저장
+                total_score += part_score
+                max_score = 0
                 if messages_list:
                     analysis.append("\n".join([part_analysis[0]] + messages_list))
+            score_data.append({"total_score": round(total_score / 135 * 100, 2)})  # 총 점수를 백분율로 저장
             json.dump(json_data, jsonfile, ensure_ascii=False, indent=4)
+            json.dump(score_data, scorefile, ensure_ascii=False, indent=4)
 
         print("\n\n".join(analysis))
     #     save txt file with the analysis
         with open(self.folder_path + f'/{self.folder_path.split("/")[1]}_swing_analysis.txt', 'w') as f:
             f.write("\n\n".join(analysis))
             print("Analysis saved to swing_analysis.txt")
+        return round(total_score / 135 * 100, 2)
 
     def save_frame(self):
         """

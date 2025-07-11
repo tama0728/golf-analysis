@@ -69,4 +69,4 @@ def run_swing_analyzer(file_id):
     #     axes[i].axis('off')
     # plt.tight_layout()
     # plt.show()
-    video_processor.print_swing_analysis()
+    return video_processor.print_swing_analysis()

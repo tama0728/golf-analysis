@@ -70,17 +70,20 @@ def upload_file():
 
             # file_id = "304"
             # 영상 처리 실행
-            run_swing_analyzer(file_id)
+            score = run_swing_analyzer(file_id)
 
             return jsonify({
                 "message": "File processed successfully",
+                "file_id": file_id,
                 "download_url": f"/download/video/{file_id}",
                 "video_url": f"/download/video/{file_id}",
                 "zip_url": f"/download/images/{file_id}",
                 "image_address_url": f"/download/image/address/{file_id}",
-                "image_contact_url": f"/download/image/contact/{file_id}",
                 "image_top_url": f"/download/image/top/{file_id}",
-                "swing_analysis": f"/result/{file_id}"
+                "image_contact_url": f"/download/image/contact/{file_id}",
+                "swing_analysis": f"/result/{file_id}",
+                "score": score,
+                "score_url": f"/score/{file_id}"
             }), 200
 
         return jsonify({"error": "Invalid file type"}), 400
@@ -182,7 +185,23 @@ def get_result(file_id):
     try:
         with open(json_file_path, 'r') as file:
             data = json.load(file)
-        return jsonify(data), 200
+        return data, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# 결과 점수
+@app.route('/score/<file_id>', methods=['GET'])
+def get_score(file_id):
+    """분석 점수 반환"""
+    processed_folder = os.path.join(PROCESSED_FOLDER, file_id)
+    score_file_path = os.path.join(processed_folder, f"{file_id}_swing_score.json")
+
+    if not os.path.exists(score_file_path):
+        return jsonify({"error": "Score not found"}), 404
+    try:
+        with open(score_file_path, 'r') as file:
+            data = json.load(file)
+        return data, 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
