@@ -203,7 +203,7 @@ class VideoProcessor:
                         })
                         part_score += score_table[check]
                     max_score += score_table[check]
-                score_data.append({"swing_part": swing_part.upper(), "score": round(part_score/ max_score * 100, 2)})  # 각 스윙 파트의 점수를 백분율로 저장
+                score_data.append({f"{swing_part.upper()}_score": round(part_score/ max_score * 100, 2)})  # 각 스윙 파트의 점수를 백분율로 저장
                 total_score += part_score
                 max_score = 0
                 if messages_list:
